@@ -1,0 +1,63 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.role == 'admin' ||
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
+      );
+    }
+
+    // -----------------------------------------------------------------
+    // 1. PRODUCTS COLLECTION
+    // Rule: Anyone can browse active campus products.
+    // Rule: Customers NEVER have permission to create, edit, or delete product records.
+    // -----------------------------------------------------------------
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // -----------------------------------------------------------------
+    // 2. USERS COLLECTION & USER-OWNED CART ITEMS
+    // Rule: Students can only read their own profile document.
+    // Rule: During registration, role must strictly be 'student'. No privilege escalation allowed.
+    // Rule: Student cartItems subcollection is accessible only by the owning student.
+    // -----------------------------------------------------------------
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      // On create, non-admins can only create profile with role == 'student'
+      allow create: if isOwner(userId) && (!('role' in request.resource.data) || request.resource.data.role == 'student');
+      // On update, students cannot alter their own 'role' field
+      allow update: if (isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role'])) || isAdmin();
+      allow delete: if isAdmin();
+
+      match /cartItems/{cartItemId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // -----------------------------------------------------------------
+    // 3. ORDERS COLLECTION
+    // Rule: Students can create orders for themselves with their own authenticated uid.
+    // Rule: Students can only view their own past & active campus orders.
+    // Rule: Modifying or deleting placed orders is blocked for customers.
+    // -----------------------------------------------------------------
+    match /orders/{orderId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+  }
+}

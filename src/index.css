@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* UniMart Forest Green, Warm Ivory, Sand & Muted Clay Palette */
+    --background: 40 33% 98%;           /* #FAF8F5 Warm Ivory */
+    --foreground: 152 35% 14%;          /* #163022 Deep Forest Charcoal */
+
+    --card: 0 0% 100%;                  /* #FFFFFF Clean crisp white surface */
+    --card-foreground: 152 35% 14%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 152 35% 14%;
+
+    --primary: 152 43% 16%;             /* #173B28 Deep Academic Forest Green */
+    --primary-foreground: 40 33% 98%;   /* Warm Ivory text */
+    --primary-hover: 152 48% 12%;       /* Darker Forest Green */
+    --primary-light: 150 25% 94%;       /* Pale Sage Tint */
+
+    --secondary: 38 25% 93%;            /* #F4EFE7 Light Sand/Warm Stone */
+    --secondary-foreground: 152 40% 18%;
+
+    --muted: 38 20% 92%;                /* #ECE5DA Muted Sand */
+    --muted-foreground: 150 10% 42%;    /* Soft Forest Slate */
+
+    --accent: 14 54% 46%;               /* #B54F34 Muted Clay / Terracotta */
+    --accent-foreground: 40 33% 98%;
+    --accent-hover: 14 58% 38%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 38 18% 87%;               /* #E1D9CD Subtle warm sand border */
+    --input: 38 18% 84%;                /* #DDD4C6 */
+    --ring: 152 43% 22%;
+
+    --radius: 0.375rem;                 /* 6px - refined, sharp, sophisticated */
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans min-h-screen flex flex-col;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-serif tracking-tight text-foreground;
+  }
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f4efe7;
+}
+::-webkit-scrollbar-thumb {
+  background: #c9bea9;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a99d87;
+}
+
+/* Subtle micro utilities */
+.academic-badge {
+  @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-medium rounded-full bg-sand-100 text-forest-800 border border-sand-300;
+}
+
+.clay-badge {
+  @apply inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-full bg-clay-50 text-clay-700 border border-clay-200;
+}
